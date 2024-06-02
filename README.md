@@ -30,9 +30,11 @@ Aplicación de agenda que permite a los usuarios registrarse, iniciar sesión, c
 
     ```
 
-6. Vamos abriendo una terminal, dentro de ella le damos 'cd Agenda' para dirigirnos a la carpeta de Agenda, introducimos 'npm start' ejecutando nuestro proyecto y en caso de quererlo correr en android, ponemos "a":
+6. Vamos abriendo una terminal, dentro de ella le damos 'cd Agenda' para dirigirnos a la carpeta de Agenda, introducimos 'npm install' para instalar todas las dependencias necesarias para ejecutarlo y luego ponemos 'npm start' ejecutando nuestro proyecto y en caso de quererlo correr en android, ponemos "a":
     ```bash
     cd Agenda
+
+    npm install
     
     npm start
 
