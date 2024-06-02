@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
@@ -29,13 +29,12 @@ const AgendaScreen = () => {
     }
   };
 
-  // Llamar a fetchNotes cada vez que AgendaScreen recibe el enfoque
   useFocusEffect(
     React.useCallback(() => {
       fetchNotes();
     }, [])
   );
-  
+
   const handleAddNote = async () => {
     const newNote = { title: newTitle, content: newContent, date: selectedDate.format('YYYY-MM-DD') };
     const updatedNotes = [...notes, newNote];
@@ -45,7 +44,6 @@ const AgendaScreen = () => {
     setNewContent('');
     setIsAdding(false);
 
-    // Llamar a la función para crear la nota en el servidor
     await createNoteOnServer();
   };
 
@@ -54,21 +52,23 @@ const AgendaScreen = () => {
       const response = await fetch('http://192.168.0.15/agenda/notas.php', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded', // Cambiar el tipo de contenido
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ // Utilizar URLSearchParams para serializar los datos del formulario
+        body: new URLSearchParams({
           action: 'create_note',
           titulo: newTitle,
           contenido: newContent,
-        }),
+        }).toString(),
       });
-      
-      console.log(response.data); // Añade esta línea
 
       const responseData = await response.json();
       console.log(responseData);
+      if (responseData.status === 'error') {
+        Alert.alert('Error', responseData.message);
+      }
     } catch (error) {
       console.error('Error al crear la nota:', error);
+      Alert.alert('Error al crear la nota');
     }
   };
 
@@ -162,7 +162,7 @@ const AgendaScreen = () => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    backgroundColor: '#FFFFFF', // Color de fondo azul claro
+    backgroundColor: '#FFFFFF',
   },
   container: {
     flex: 1,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   dayContainer: {
     alignItems: 'center',
     padding: 8,
-    marginHorizontal: 8, // Adjust margin to space out the days
+    marginHorizontal: 8,
     borderRadius: 4,
     backgroundColor: '#f0f0f0',
   },
@@ -213,8 +213,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: 'white',
-    marginLeft: 8
-,
+    marginLeft: 8,
   },
   inputContainer: {
     marginBottom: 16,

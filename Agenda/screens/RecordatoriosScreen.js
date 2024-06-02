@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native'; // Importar useFocusEffect desde @react-navigation/native
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
+import moment from 'moment';
 
 const RecordatoriosScreen = () => {
   const [notes, setNotes] = useState([]);
 
-  // Utilizar useFocusEffect para ejecutar la lógica de carga de notas cada vez que la pantalla gana foco
   useFocusEffect(
     React.useCallback(() => {
       const fetchNotes = async () => {
         try {
           const response = await axios.get('http://192.168.0.15/agenda/get_notes.php');
           if (response.data.status === 'success') {
-            setNotes(response.data.notes);
+            const today = moment().startOf('day');
+            const threeDaysFromNow = moment().add(3, 'days').endOf('day');
+            
+            // Verificar las fechas de las notas
+            console.log('Notas obtenidas:', response.data.notes);
+
+            const filteredNotes = response.data.notes.filter(note => {
+              const noteDate = moment(note.createdAt);
+              console.log('Fecha de la nota:', note.createdAt, 'Fecha parseada:', noteDate.format());
+
+              return noteDate.isBetween(today, threeDaysFromNow, null, '[]');
+            });
+
+            console.log('Notas filtradas:', filteredNotes);
+            setNotes(filteredNotes);
           } else {
             console.error('Error al obtener las notas:', response.data.message);
           }
@@ -24,20 +38,19 @@ const RecordatoriosScreen = () => {
 
       fetchNotes();
 
-      // Limpiar notas al salir de la pantalla (opcional)
       return () => setNotes([]);
     }, [])
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>RECODARTORIOS DE ACTIVIDADES</Text>
+      <Text style={styles.title}>RECORDATORIOS DE ACTIVIDADES</Text>
       <ScrollView style={styles.notesContainer}>
         {notes.map((note) => (
           <View key={note.id_nota} style={styles.noteItem}>
             <Text style={styles.noteTitle}>{note.titulo}</Text>
             <Text>{note.contenido}</Text>
-            <Text>{note.createdAt}</Text>
+            <Text>{moment(note.createdAt).format('MMMM Do YYYY, h:mm:ss a')}</Text>
           </View>
         ))}
       </ScrollView>

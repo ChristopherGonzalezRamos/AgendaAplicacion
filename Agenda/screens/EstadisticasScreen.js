@@ -1,30 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import axios from 'axios';
 import { PieChart } from 'react-native-chart-kit';
+import { useFocusEffect } from '@react-navigation/native';
+import moment from 'moment';
 
-export default function EstadisticasScreen() {
+const EstadisticasScreen = () => {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStatistics = async () => {
-      try {
-        const response = await axios.get('http://192.168.0.15/agenda/get_estadistica.php');
-        if (response.data.status === 'success') {
-          setStatistics(response.data);
-        } else {
-          console.error('Error fetching statistics:', response.data.message);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchStatistics = async () => {
+        try {
+          const response = await axios.get('http://192.168.0.15/agenda/get_estadistica.php');
+          if (response.data.status === 'success') {
+            setStatistics(response.data);
+          } else {
+            console.error('Error fetching statistics:', response.data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching statistics:', error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error('Error fetching statistics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchStatistics();
-  }, []);
+      fetchStatistics();
+      
+      // Reset the loading state for next focus
+      return () => {
+        setLoading(true);
+        setStatistics(null);
+      };
+    }, [])
+  );
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -86,7 +96,7 @@ export default function EstadisticasScreen() {
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -120,3 +130,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default EstadisticasScreen;

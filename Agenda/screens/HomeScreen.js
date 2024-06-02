@@ -1,11 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 
 const HomeScreen = () => {
   return (
     <View style={styles.background}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Bienvenido a Notes</Text>
+        <View style={styles.row}>
+          <Image
+            source={{ uri: 'https://cdn-icons-png.freepik.com/512/7996/7996558.png' }}
+            style={styles.image}
+          />
+          <Text style={styles.title}>Bienvenido a Notes</Text>
+        </View>
         <Text style={styles.subtitle}>
           La aplicación que te ayudará a organizar mejor tus actividades diarias.
         </Text>
@@ -21,7 +27,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    backgroundColor: '#FFFFFF', // Color de fondo azul claro
+    backgroundColor: '#FFFFFF',
   },
   container: {
     flexGrow: 1,
@@ -29,11 +35,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  image: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
     color: '#333',
   },
   subtitle: {
