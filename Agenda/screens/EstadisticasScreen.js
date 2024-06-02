@@ -1,38 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import axios from 'axios';
-import { PieChart } from 'react-native-chart-kit';
-import { useFocusEffect } from '@react-navigation/native';
+import { BarChart } from 'react-native-chart-kit';
 import moment from 'moment';
+import { useFocusEffect } from '@react-navigation/native';
 
-const EstadisticasScreen = () => {
+export default function EstadisticasScreen() {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchStatistics = async () => {
+    try {
+      const response = await axios.get('http://192.168.0.15/agenda/get_estadistica.php');
+      if (response.data.status === 'success') {
+        setStatistics(response.data);
+      } else {
+        console.error('Error fetching statistics:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching statistics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      const fetchStatistics = async () => {
-        try {
-          const response = await axios.get('http://192.168.0.15/agenda/get_estadistica.php');
-          if (response.data.status === 'success') {
-            setStatistics(response.data);
-          } else {
-            console.error('Error fetching statistics:', response.data.message);
-          }
-        } catch (error) {
-          console.error('Error fetching statistics:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchStatistics();
-      
-      // Reset the loading state for next focus
-      return () => {
-        setLoading(true);
-        setStatistics(null);
-      };
     }, [])
   );
 
@@ -40,63 +34,54 @@ const EstadisticasScreen = () => {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
-  const data = [
-    {
-      name: 'Última semana',
-      count: statistics.notes_last_week,
-      color: '#FF6347',
-      legendFontColor: '#7F7F7F',
-      legendFontSize: 15,
-    },
-    {
-      name: 'Hoy',
-      count: statistics.notes_today,
-      color: '#4682B4',
-      legendFontColor: '#7F7F7F',
-      legendFontSize: 15,
-    },
-  ];
+  const barData = {
+    labels: ['Notas Hoy', 'Notas Última Semana'],
+    datasets: [
+      {
+        data: [statistics.notes_today, statistics.notes_last_week],
+      },
+    ],
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Estadísticas de Notas</Text>
       <View style={styles.chartContainer}>
-        <PieChart
-          data={data}
+        <BarChart
+          data={barData}
           width={300}
           height={200}
+          yAxisLabel=""
           chartConfig={{
-            backgroundColor: '#FFFFFF',
-            backgroundGradientFrom: '#FFFFFF',
-            backgroundGradientTo: '#FFFFFF',
+            backgroundGradientFromOpacity: 0,
+            backgroundGradientToOpacity: 0,
             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             style: {
               borderRadius: 16,
             },
-            propsForDots: {
-              r: '4',
-              strokeWidth: '2',
-              stroke: '#FFFFFF',
-            },
           }}
-          accessor="count"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute
+          style={{
+            marginVertical: 8,
+            borderRadius: 16,
+          }}
+          fromZero={true}
+          showValuesOnTopOfBars={true}
+          yAxisInterval={5}
+          decimalPlaces={0}
         />
       </View>
       <View style={styles.statContainer}>
-        <Text style={styles.statLabel}>Notas en la última semana:</Text>
-        <Text style={styles.statValue}>{statistics.notes_last_week}</Text>
+        <Text style={styles.statLabel}>Notas Hoy:</Text>
+        <Text style={styles.statValue}>{statistics.notes_today}</Text>
       </View>
       <View style={styles.statContainer}>
-        <Text style={styles.statLabel}>Notas de hoy:</Text>
-        <Text style={styles.statValue}>{statistics.notes_today}</Text>
+        <Text style={styles.statLabel}>Notas Última Semana:</Text>
+        <Text style={styles.statValue}>{statistics.notes_last_week}</Text>
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -111,7 +96,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   chartContainer: {
-    marginVertical: 10,
     alignItems: 'center',
   },
   statContainer: {
@@ -130,5 +114,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-export default EstadisticasScreen;
