@@ -22,13 +22,74 @@ Aplicación de agenda que permite a los usuarios registrarse, iniciar sesión, c
 
 4. Una vez abierto, seleccionamos "File", damos click en "Open Folder" y seleccionamos la carpeta del proyecto que descargamos.
 
-5. Una vez abierto, configuramos la dirección IP del servidor en los archivos de la aplicación de acuerdo al equipo de cómputo
-    ```javascript
-    const API_URL = 'http://<tu-ip-local>';
+5. Una vez abierto, configuramos la dirección IP del servidor en los archivos de la aplicación de acuerdo al equipo de cómputo, los cuáles son los siguientes:
 
-    ('http://<tu-ip-local>/agenda/<nombre_del_php>');
+RecordatoriosScreen.js
+    ```javascript
+
+     axios.get('http://<direccion_ip>/agenda/get_notes.php');
 
     ```
+
+ProfileScreen.js
+    ```javascript
+
+    axios.get(`http://<direccion_ip>/agenda/get_profile.php?email=${email}`);
+
+    await axios.post('http://<direccion_ip>/agenda/update_profile_image.php', { email, profile_image: uri });
+    ```
+
+LoginScreen.js
+    ```javascript
+
+     axios.get('http://<direccion_ip>/agenda/login.php, {
+
+    ```
+
+EstadísticasScreen.js
+    ```javascript
+
+     axios.get('http://<direccion_ip>/agenda/get_estadística.php');
+
+    ```
+
+AgendaScreen.js
+    ```javascript
+
+     await fetch('http://<direccion_ip>/agenda/get_notes.php');
+
+     await fetch('http://<direccion_ip>/agenda/notas.php', {
+
+    ```
+
+BuscarNotasScreen.js
+    ```javascript
+
+     axios.post('http://<direccion_ip>/agenda/search_notas.php', { query });
+
+    ```
+
+EditarAgendaScreen.js
+    ```javascript
+
+     await fetch('http://<direccion_ip>/agenda/get_notes.php');
+
+    const handleUpdateNote = async () => {
+        try {
+          const response = await fetch('http://<direccion_ip>/agenda/editar_notas.php', {
+
+    const handleDeleteNote = async () => {
+        try {
+          const response = await fetch('http://<direccion_ip>/agenda/editar_notas.php', {
+
+    ```
+
+RegisterScreen.js
+    ```javascript
+
+     await axios.post('http://<direccion_ip>/agenda/register.php', {
+
+    ```  
 
 6. Vamos abriendo una terminal, dentro de ella le damos 'cd Agenda' para dirigirnos a la carpeta de Agenda, introducimos 'npm install' para instalar todas las dependencias necesarias para ejecutarlo y luego ponemos 'npm start' ejecutando nuestro proyecto y en caso de quererlo correr en android, ponemos "a":
     ```bash
